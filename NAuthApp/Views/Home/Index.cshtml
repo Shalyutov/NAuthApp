@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="row flex-lg-row-reverse align-items-center">
+    <div class="col-10 col-sm-8 col-lg-6">
+        <img src="~/img/identity security.jpg" class="d-block mx-lg-auto img-fluid" height="500" loading="lazy">
+    </div>
+    <div class="col-lg-6">
+        <div class="lh-1 mb-3 spacious fs-3">Федеративное управление доступом для вашей экосистемы</div>
+        <p>Обеспечьте единый вход для ваших проектов с помощью управляемого сервиса</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a asp-action="Index" class="btn btn-primary btn-lg px-4 me-md-2">Подключить</a>
+        </div>
+    </div>
+</div>
+
+<h1>Безопасноть данных - наша забота</h1>
+<p class="fs-5 col-md-8">Добро пожаловать в систему аутентификации и авторизации NAuth</p>
+
+<div class="mb-5">
+    <a class="btn btn-primary btn-lg px-4" asp-action="Account" asp-controller="User">Войти в аккаунт</a>
+</div>
+
+<hr class="col-3 col-md-2 mb-5">
+
+<div class="row g-5">
+    <div class="col-md-6">
+        <h2>Поддержка</h2>
+        <ul class="icon-list ps-0">
+            <li class="d-flex align-items-start mb-1"><a href="#">Политика конфиденциальности</a></li>
+            <li class="text-muted d-flex align-items-start mb-1">Обработка ПДн</li>
+        </ul>
+    </div>
+
+    <div class="col-md-6">
+        <h2>Помощь</h2>
+        <p>Впервые на сайте? Здесь вы найдёте ответы на часто задаваемые вопросы</p>
+        <ul class="icon-list ps-0">
+            <li class="d-flex align-items-start mb-1"><a href="help_login.html">Как войти в аккаунт?</a></li>
+            <li class="d-flex align-items-start mb-1"><a href="#">Что делать если не удаётся войти?</a></li>
+            <li class="d-flex align-items-start mb-1"><a href="#">Как восстановить пароль?</a></li>
+        </ul>
+    </div>
+</div>
+
+<div>
+    <h5>Мы готовы помочь</h5>
+    <p>Напишите нам: <a href="mailto:account@univeris.tech">account@univeris.tech</a></p>
+</div>

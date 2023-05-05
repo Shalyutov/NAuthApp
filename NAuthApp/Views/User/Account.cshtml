@@ -1,0 +1,77 @@
+﻿@using System.Security.Claims;
+@{
+    Layout = "_LayoutAccount.cshtml";
+}
+<div class="profile-header glasscard-profile">
+    <div class="m-2">
+        <a class="navbar-brand" asp-action="Account">
+            <p class="mt-5 mb-1">
+                <img src="~/img/NAuthExpColor.png" height="36" />
+            </p>
+        </a>
+        <h1><strong>Аккаунт</strong></h1>
+        <div class="">
+            <div class="card mb-2 mt-1 p-1" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <div class="container">
+                        <div class="flex-shrink-0">
+                            <img src="img/photo.jpg" alt="photo" class="img-fluid" style="height: 72px; border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="container">
+                        <h5 class="mb-2 mt-2">@Context.User.FindFirst(ClaimTypes.Surname)?.Value @Context.User.FindFirst(ClaimTypes.Name)?.Value</h5>
+                        <div class="badge rounded-pill bg-primary">@Context.User.FindFirst(ClaimTypes.Upn)?.Value</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-2 mt-2 p-1" style="border-radius: 15px;">
+                <div class="card-body">
+                    <div class="input-group has-validation mb-2">
+                        <input type="email" class="form-control" id="email" placeholder="Username" value="shalyutov@ya.ru">
+                    </div>
+                    <div class="input-group has-validation mb-2">
+                        <input type="tel" class="form-control" id="phone" placeholder="Username" value="+79226998379">
+                    </div>
+                    <div class="list-group w-auto">
+                        <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">Студент группы КЭ-202</h6>
+                                </div>
+                                <small class="opacity-50 text-nowrap"></small>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">Кафедра Системного программирования</h6>
+                                </div>
+                                <small class="opacity-50 text-nowrap"></small>
+                            </div>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0">Высшая школа электроники и компьютерных наук</h6>
+                                </div>
+                                <small class="opacity-50 text-nowrap"></small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-2 mt-2 p-1" style="border-radius: 15px;">
+                <div class="card-body">
+                    <h6>Пароль</h6>
+                    <div class="input-group has-validation mb-2">
+                        <input type="password" class="form-control" placeholder="Username" value="*********">
+                    </div>
+                    <button type="button" class="btn btn-outline-primary mt-1">Сменить</button>
+                </div>
+            </div>
+            <div class="container mt-2">
+                <button type="button" class="btn btn-outline-success mt-2">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>

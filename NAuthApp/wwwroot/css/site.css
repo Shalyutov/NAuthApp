@@ -1,0 +1,55 @@
+@font-face {
+    font-family: 'Random Grotesque Regular';
+    src: url('../fonts/RG-StandardMedium.woff2') format('woff2'), url('../fonts/RG-StandardMedium.woff') format('woff'), url('../fonts/RG-StandardMedium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Random Grotesque Bold';
+    src: url('../fonts/RG-StandardBold.woff2') format('woff2'), url('../fonts/RG-StandardBold.woff') format('woff'), url('../fonts/RG-StandardBold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Random Grotesque Spacious';
+    src: url('../fonts/RG-SpaciousRegular.woff2') format('woff2'), url('../fonts/RG-SpaciousRegular.woff') format('woff'), url('../fonts/RG-SpaciousRegular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html,
+body {
+    font-family: 'Random Grotesque Regular', sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Random Grotesque Bold', sans-serif;
+}
+p {
+    font-family: 'Random Grotesque Regular', sans-serif;
+}
+.spacious {
+    font-family: 'Random Grotesque Spacious', sans-serif;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
