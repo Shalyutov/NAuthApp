@@ -28,5 +28,11 @@ namespace NAuthApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        [Route("/b2b")]
+        public IActionResult B2B()
+        {
+            return View();
+        }
     }
 }

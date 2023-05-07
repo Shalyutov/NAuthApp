@@ -13,13 +13,10 @@
         <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
             <a asp-action="Index" asp-controller="Home" class="d-flex align-items-center text-dark text-decoration-none">
                 <img src="~/img/NAuthExpColor.png" height="48" />
+                <span>Для бизнеса</span>
             </a>
             <div class="m-auto"></div>
-            <ul class="nav me-3">
-                <li><a asp-action="B2B" class="nav-link px-2 text-secondary">Для бизнеса</a></li>
-                <li><a asp-action="Privacy" class="nav-link px-2 text-secondary">ПДн</a></li>
-            </ul>
-            <a asp-action="Account" class="btn btn-outline-primary px-4 me-md-2">Войти</a>
+            <a asp-action="B2B" class="btn btn-primary px-4 me-md-2">Подключить</a>
         </header>
         <main>
             @RenderBody()
