@@ -4,13 +4,13 @@
 }
 <div class="form-signin glasscard">
     <div>
-        <form asp-action="SignIn" class="m-4">
+        <form asp-action="NSignIn" asp-controller="User" class="m-4">
             <a asp-action="Index" asp-controller="Home" class="navbar-brand">
-                <p class="mt-3 mb-3">
+                <p class="mt-2 mb-2">
                     <img src="~/img/NAuthExpColor.png" height="56" />
                 </p>
             </a>
-            <h1 class="h3 mb-3 fw-normal">Войдите в аккаунт</h1>
+            <h4 class="mb-2 fw-normal">Войдите в аккаунт</h4>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-floating">
                 <input asp-for="Username" class="form-control" id="userinput" />
@@ -26,7 +26,7 @@
                 <input type="submit" value="Войти" class="w-100 btn btn-lg btn-primary" />
             </div>
 
-            <p class="mt-3 mb-0 text-muted">&copy; 2023</p>
+            <p class="mt-2 mb-0 text-muted">&copy; 2023</p>
         </form>
     </div>
 </div>

@@ -19,7 +19,7 @@
                 <li><a asp-action="B2B" class="nav-link px-2 text-secondary">Для бизнеса</a></li>
                 <li><a asp-action="Privacy" class="nav-link px-2 text-secondary">ПДн</a></li>
             </ul>
-            <a asp-action="Account" class="btn btn-outline-primary px-4 me-md-2">Войти</a>
+            <a asp-action="Account" asp-controller="User" class="btn btn-outline-primary px-4 me-md-2">Войти</a>
         </header>
         <main>
             @RenderBody()
