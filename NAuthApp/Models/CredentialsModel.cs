@@ -5,9 +5,11 @@ namespace NAuthApp.Models
 {
     public class CredentialsModel
     {
-        [Remote("IsUserExists", "User", HttpMethod = "Get", ErrorMessage = "Пользователя не существует")]
+        [Remote("IsUserExists", "User", HttpMethod = "Get")]
+        [Required(ErrorMessage = "Обязательное поле")]
         public string? Username { get; set;}
         [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Обязательное поле")]
         public string? Password { get; set;}
     }
 }

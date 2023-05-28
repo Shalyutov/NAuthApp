@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,7 +20,14 @@
                 <li><a asp-action="B2B" class="nav-link px-2 text-secondary">Для бизнеса</a></li>
                 <li><a asp-action="Privacy" class="nav-link px-2 text-secondary">ПДн</a></li>
             </ul>
-            <a asp-action="Account" asp-controller="User" class="btn btn-outline-primary px-4 me-md-2">Войти</a>
+            @if (Context.User.Identity?.IsAuthenticated ?? false)
+            {
+                <a asp-action="Account" asp-controller="User" class="px-3 me-md-2 link-dark"><img src="~/img/user.png" height="18" class="ms-1 me-1">@Context.User.FindFirst(ClaimTypes.Name)?.Value</a>
+            }
+            else
+            {
+                <a asp-action="Account" asp-controller="User" class="btn btn-outline-primary px-4 me-md-2">Войти</a>
+            }
         </header>
         <main>
             @RenderBody()

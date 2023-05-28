@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NAuthApp.Models;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,7 +14,7 @@ namespace NAuthApp.Controllers
         readonly string federation;
         readonly string app;
         readonly string secret;
-        HttpClient client;
+        readonly HttpClient client;
         public UserController(IConfiguration config, IHttpClientFactory factory) 
         {
             federation = config["Federation"] ?? string.Empty;
@@ -21,18 +22,17 @@ namespace NAuthApp.Controllers
             secret = config["Secret"] ?? string.Empty;
             client = factory?.CreateClient() ?? new HttpClient();
             client.BaseAddress = new Uri(federation);
-            client.Timeout = TimeSpan.FromSeconds(5);
+            client.Timeout = TimeSpan.FromSeconds(10);
         }
         [Route("/signin")]
+        [HttpGet]
         public async Task<IActionResult> SignIn()
         {
-            HttpRequestMessage request = new(HttpMethod.Get, $"auth/api/db/status");
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(3000);
+            HttpRequestMessage request = new(HttpMethod.Get, "auth/db/status");
             try
             {
-                var result = await client.SendAsync(request, cancellationTokenSource.Token);
-                if (result.EnsureSuccessStatusCode() != null)
+                var result = await client.SendAsync(request);
+                if (result != null)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -45,7 +45,7 @@ namespace NAuthApp.Controllers
                     return RedirectToAction("Availability");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return RedirectToAction("Availability");
             }
@@ -68,28 +68,27 @@ namespace NAuthApp.Controllers
         public async Task<IActionResult> NSignOut()
         {
             await HttpContext.SignOutAsync();
-            return View("SignIn");
+            return RedirectToAction("SignIn");
         }
         [AcceptVerbs("Get")]
         public async Task<IActionResult> IsUserExists(string Username)
         {
-            HttpRequestMessage request = new(HttpMethod.Get, $"auth/api/account/exists?username={Username}");
-            var cred = new Dictionary<string, string>
-                {
-                    { "client_id", app },
-                    { "client_secret", secret },
-                };
-            request.Content = new FormUrlEncodedContent(cred);
-            var cancellationTokenSource = new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(3000);
+            HttpRequestMessage request = new(HttpMethod.Get, $"auth/account/exists?username={Username}");
+            request.Headers.Add("client_id", new List<string>() { app });
+            request.Headers.Add("client_secret", new List<string>() { secret });
             try
             {
-                var result = await client.SendAsync(request, cancellationTokenSource.Token);
-                if (result.EnsureSuccessStatusCode() != null)
+                var result = await client.SendAsync(request);
+                if (result != null)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        return Json(await result.Content.ReadAsStringAsync());
+                        var state = await result.Content.ReadAsStringAsync();
+                        if (state != "true")
+                        {
+                            return Json("Пользователя не существует");
+                        }
+                        else return Json(true);
                     }
                     else return Json("Неверный ответ от федерации удостоверений");
                 }
@@ -98,7 +97,7 @@ namespace NAuthApp.Controllers
                     return Json("Ошибка при обработке запроса");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json("Ошибка при обработке запроса");
             }
@@ -106,65 +105,56 @@ namespace NAuthApp.Controllers
         [HttpPost]
         [Route("/signin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> NSignIn([Bind("Username,Password")] CredentialsModel pair)
+        public async Task<IActionResult> NSignIn(CredentialsModel pair)
         {
             if (ModelState.IsValid)
             {
-                if (pair != null)
+                HttpRequestMessage request = new(HttpMethod.Post, "auth/signin");
+                var cred = new Dictionary<string, string>
                 {
-                    HttpRequestMessage request = new(HttpMethod.Post, $"auth/api/signin");
-                    var cred = new Dictionary<string, string>
-                    {
-                        { "client_id", "NAUTH" },
-                        { "client_secret", "758694321" },
-                        { "username", pair.Username ?? "" },
-                        { "password", pair.Password ?? "" }
-                    };
-                    request.Content = new FormUrlEncodedContent(cred);
-                    var result = await client.SendAsync(request);
-                    if (result != null)
-                    {
-                        if (result.StatusCode == System.Net.HttpStatusCode.OK)
-                        {
-                            IdPair? auth = JsonConvert.DeserializeObject<IdPair>(await result.Content.ReadAsStringAsync());
-                            if (auth != null)
-                            {
-                                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                                var id = handler.ReadJwtToken(auth.id_token);
-                                ClaimsIdentity identity = new(id.Claims, "Cookies");
-                                ClaimsPrincipal principal = new(identity);
-                                AuthenticationProperties properties = new();
-                                AuthenticationToken refresh_token = new() { Name = "refresh_token", Value = auth.refresh_token };
-                                properties.StoreTokens(new List<AuthenticationToken>() { refresh_token });
-                                properties.IsPersistent = true;
-                                await HttpContext.SignInAsync(principal, properties);
-                                return RedirectToAction("Account");
-                            }
-                            else
-                            {
-                                ModelState.AddModelError("FID1", "Федерация удостоверений возвращает пустой ответ");
-                                return View();
-                            }
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("FID0", "Федерация удостоверений не отвечает");
-                            return View();
-                        }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("R0", "Ошибка при отправке запроса");
-                        return View();
-                    }
-                }
-                else
+                    { "username", pair.Username ?? "" },
+                    { "password", pair.Password ?? "" }
+                };
+                request.Headers.Add("client_id", new List<string>() { app });
+                request.Headers.Add("client_secret", new List<string>() { secret });
+                request.Content = new FormUrlEncodedContent(cred);
+                var result = await client.SendAsync(request);
+                if (result != null)
                 {
-                    ModelState.AddModelError("С0", "Нет идентификационной информации");
-                    return View();
+                    if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        IdPair? auth = JsonConvert.DeserializeObject<IdPair>(await result.Content.ReadAsStringAsync());
+                        if (auth != null)
+                        {
+                            JwtSecurityTokenHandler handler = new();
+                            var id = handler.ReadJwtToken(auth.id_token);
+                            var refresh = handler.ReadJwtToken(auth.refresh_token);
+                            ClaimsIdentity identity = new(id.Claims, "Cookies");
+                            ClaimsPrincipal principal = new(identity);
+                            AuthenticationProperties properties = new();
+                            AuthenticationToken refresh_token = new() { Name = "refresh_token", Value = auth.refresh_token };
+                            properties.StoreTokens(new List<AuthenticationToken>() { refresh_token });
+                            properties.ExpiresUtc = refresh.ValidTo;
+                            properties.IsPersistent = true;
+                            await HttpContext.SignInAsync(principal, properties);
+                            return RedirectToAction("Account");
+                        }
+                        else ModelState.AddModelError("", "Федерация удостоверений возвращает пустой ответ");
+                    }
+                    else if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        ModelState.AddModelError("", "Неправильный логин или пароль");
+                    }
+                    else if (result.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        ModelState.AddModelError("", "Неверно сформирован запрос");
+                    }
+                    else ModelState.AddModelError("", "Федерация удостоверений не отвечает");
                 }
+                else ModelState.AddModelError("", "Федерация удостоверений недоступна");
             }
-            else return View();
+            else ModelState.AddModelError("", "Форма входа заполнена неверно");
+            return View("SignIn", pair);
         }
     }
 }
