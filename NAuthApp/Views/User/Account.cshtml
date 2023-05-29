@@ -33,17 +33,27 @@
                         <img src="~/img/edit.png" alt="twbs" height="28" class="flex-shrink-0">
                         <span class="ms-2">Редактировать аккаунт</span>
                     </a>
+                    <a href="#" class="list-group-item list-group-item-action container gap-2 py-2 text-start" aria-current="true">
+                        <img src="~/img/user.png" alt="twbs" height="28" class="flex-shrink-0">
+                        <span class="ms-2">Получить данные</span>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action container gap-2 py-2 text-start" aria-current="true">
+                        <img src="~/img/logout.png" alt="twbs" height="26" class="flex-shrink-0">
+                        <span class="ms-2">Завершить все сессии</span>
+                    </a>
                 </div>
-                <div class="m-1 text-start text-muted"><small>Телефон</small></div>
-                <div class="input-group mb-1">
-                    <input type="tel" class="form-control rounded w-100" placeholder="Телефон" value="+@Context.User.FindFirst(ClaimTypes.MobilePhone)?.Value">
-                </div>
-                <div class="m-1 text-start text-muted"><small>Email</small></div>
-                <div class="input-group mb-1">
-
-                    <input type="email" class="form-control w-100 rounded" placeholder="Email" value="@Context.User.FindFirst(ClaimTypes.Email)?.Value">
-                </div>
-                <button class="btn btn-outline-success mt-2 w-100" disabled>Сохранить</button>
+                <form asp-action="UpdateAccount">
+                    <div class="m-1 text-start text-muted"><small>Телефон</small></div>
+                    <div class="input-group mb-1">
+                        <input name="Phone" type="tel" class="form-control rounded w-100" placeholder="Телефон" value="+@Context.User.FindFirst(ClaimTypes.MobilePhone)?.Value">
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Email</small></div>
+                    <div class="input-group mb-1">
+                        <input name="Email" type="email" class="form-control w-100 rounded" placeholder="Email" value="@Context.User.FindFirst(ClaimTypes.Email)?.Value">
+                    </div>
+                    <button type="submit" class="btn btn-outline-success mt-2 w-100">Сохранить</button>
+                </form>
+                
                 
             </div>
             <div class="container mt-2 p-2">
