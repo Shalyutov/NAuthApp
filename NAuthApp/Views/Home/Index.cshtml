@@ -16,7 +16,6 @@
         <h2>Поддержка</h2>
         <ul class="icon-list ps-0">
             <li class="d-flex align-items-start mb-1"><a asp-action="Privacy">Политика конфиденциальности</a></li>
-            <li class="text-muted d-flex align-items-start mb-1">Обработка ПДн</li>
         </ul>
     </div>
 
@@ -24,7 +23,7 @@
         <h2>Помощь</h2>
         <p>Впервые на сайте? Здесь вы найдёте ответы на часто задаваемые вопросы</p>
         <ul class="icon-list ps-0">
-            <li class="d-flex align-items-start mb-1"><a href="help_login.html">Как войти в аккаунт?</a></li>
+            <li class="d-flex align-items-start mb-1"><a asp-action="Help" asp-fragment="signin">Как войти в аккаунт?</a></li>
             <li class="d-flex align-items-start mb-1"><a href="#">Что делать если не удаётся войти?</a></li>
             <li class="d-flex align-items-start mb-1"><a href="#">Как восстановить пароль?</a></li>
         </ul>

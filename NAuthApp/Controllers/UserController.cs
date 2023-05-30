@@ -12,6 +12,7 @@ using System.Text;
 
 namespace NAuthApp.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         readonly string federation;
@@ -26,8 +27,9 @@ namespace NAuthApp.Controllers
 
             client = factory?.CreateClient() ?? new HttpClient();
             client.BaseAddress = new Uri(federation);
-            client.Timeout = TimeSpan.FromSeconds(10);
+            client.Timeout = TimeSpan.FromMinutes(10);
         }
+        [AllowAnonymous]
         [Route("/signin")]
         [HttpGet]
         public async Task<IActionResult> SignIn()
@@ -58,12 +60,12 @@ namespace NAuthApp.Controllers
                 return RedirectToAction("Availability");
             }
         }
+        [AllowAnonymous]
         [Route("/availability")]
         public IActionResult Availability()
         {
             return View("Unavailable");
         }
-        [Authorize]
         [Route("/account")]
         public async Task<IActionResult> Account()
         {
@@ -72,46 +74,44 @@ namespace NAuthApp.Controllers
 
             return View("Account");
         }
-        [Authorize]
         [Route("/signout")]
-        public async Task<IActionResult> NSignOut()
+        public async Task<IActionResult> Signout(bool all)
         {
             var auth = await HttpContext.AuthenticateAsync();
-            var refresh_token = auth?.Properties?.GetTokenValue("refresh_token") ?? "";
-            string access_token = HttpContext.Session.GetString("access_token") ?? "";
-            AccessPair? pair = null;
-            if (string.IsNullOrEmpty(access_token))
+            var token = auth.Properties?.GetTokens().First().Value;
+            HttpRequestMessage request;
+            if (all)
             {
-                pair = await GetAccessToken(refresh_token);
-                if (pair == null)
-                    return Unauthorized();//TODO: signout
-                access_token = pair.access_token;
+                request = new(HttpMethod.Get, "auth/signout");
             }
-            if (pair == null)
-                pair = new AccessPair() { access_token = access_token, refresh_token = refresh_token };
-            if (pair == null || pair.access_token == "")
-                return Unauthorized();
-            HttpRequestMessage request = new(HttpMethod.Get, "auth/token/revoke");
+            else
+            {
+                request = new(HttpMethod.Get, "auth/signout/this");
+            }
             request.Headers.Add("client_id", new List<string>() { app });
             request.Headers.Add("client_secret", new List<string>() { secret });
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
-            var cred = new Dictionary<string, string>();
-            JwtSecurityTokenHandler handler = new();
-            var t = handler.ReadJwtToken(pair.refresh_token);
-            cred.Add("kid", t.Header.Kid);
-            request.Content = new FormUrlEncodedContent(cred);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var result = await client.SendAsync(request);
             if (result != null)
             {
                 if (result.IsSuccessStatusCode)
                 {
-                    await HttpContext.SignOutAsync();
+                    await HttpContext.SignOutAsync(new AuthenticationProperties());
+                    HttpContext.Session.Clear();
                     return RedirectToAction("SignIn");
                 }
             }
-            var b = result.Content.ReadAsStringAsync();
             return View("Account");
         }
+        public async Task<IActionResult> AllSignout()
+        {
+            return await Signout(true);
+        }
+        public async Task<IActionResult> ThisSignout()
+        {
+            return await Signout(false);
+        }
+        [AllowAnonymous]
         [AcceptVerbs("Get")]
         public async Task<IActionResult> IsUserExists(string Username)
         {
@@ -144,54 +144,46 @@ namespace NAuthApp.Controllers
                 return Json("Сбой приложения");
             }
         }
-        private async Task<AccessPair?> GetAccessToken(string refresh_token)
+        private async Task<AccessPair?> GetAccessToken()
         {
+            var auth = await HttpContext.AuthenticateAsync();
+            string refresh_token = auth.Properties?.GetTokens().First().Value ?? string.Empty;
+            string access_token = HttpContext.Session.GetString("access_token") ?? string.Empty;
             if (string.IsNullOrEmpty(refresh_token)) return null;
-            HttpRequestMessage request = new(HttpMethod.Get, "auth/token");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refresh_token);
-            var result = await client.SendAsync(request);
-            if (result == null) 
-                return null;
-            if (result.IsSuccessStatusCode)
+            if (string.IsNullOrEmpty(access_token))
             {
-                var pair = JsonConvert.DeserializeObject<AccessPair>(await result.Content.ReadAsStringAsync());
-                JwtSecurityTokenHandler handler = new();
-                AuthenticationProperties properties = new();
-                properties.StoreTokens(new List<AuthenticationToken>() {
-                        new AuthenticationToken() { Name = "refresh_token", Value = pair?.refresh_token ?? ""}
-                    });
-                properties.ExpiresUtc = handler.ReadJwtToken(pair?.refresh_token ?? "").ValidTo;
-                properties.IsPersistent = true;
-                HttpContext.Session.SetString("access_token", pair?.access_token ?? "");
-                await HttpContext.SignInAsync(HttpContext.User, properties);
-                return pair;
+                HttpRequestMessage request = new(HttpMethod.Get, "auth/token");
+                request.Headers.Add("client_id", new List<string>() { app });
+                request.Headers.Add("client_secret", new List<string>() { secret });
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refresh_token);
+                var result = await client.SendAsync(request);
+                if (result == null)
+                    return null;
+                if (result.IsSuccessStatusCode)
+                {
+                    var pair = JsonConvert.DeserializeObject<AccessPair>(await result.Content.ReadAsStringAsync());
+                    JwtSecurityTokenHandler handler = new();
+                    auth.Properties?.UpdateTokenValue("refresh_token", pair?.refresh_token ?? "");
+                    auth.Properties?.SetParameter("ExpiresUtc", handler.ReadJwtToken(pair?.refresh_token ?? "").ValidTo);
+                    HttpContext.Session.SetString("access_token", pair?.access_token ?? "");
+                    return pair;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                return null;
+                return new AccessPair() { refresh_token = refresh_token, access_token = access_token };
             }
         }
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAccount(string? Phone, string? Email)
         {
-            var auth = await HttpContext.AuthenticateAsync();
-            string refresh_token = auth.Properties?.GetTokenValue("refresh_token") ?? "";
-            string access_token = HttpContext.Session.GetString("access_token") ?? "";
-            AccessPair? pair = null;
-            if (string.IsNullOrEmpty(access_token))
-            {
-                pair = await GetAccessToken(refresh_token);
-                if (pair == null)
-                    return Unauthorized();//TODO: signout
-                access_token = pair.access_token;
-            }
-            if (pair == null)
-                pair = new AccessPair() { access_token = access_token, refresh_token = refresh_token };
-            if (pair == null || pair.access_token == "")
+            AccessPair? pair = await GetAccessToken();
+            if (pair == null || string.IsNullOrEmpty(pair.access_token) || string.IsNullOrEmpty(pair.refresh_token))
                 return Unauthorized();
 
             HttpRequestMessage request = new(HttpMethod.Put, "auth/account/update");
@@ -254,6 +246,7 @@ namespace NAuthApp.Controllers
             }
             return RedirectToAction("Account");
         }
+        [AllowAnonymous]
         [HttpPost]
         [Route("/signin")]
         [ValidateAntiForgeryToken]
