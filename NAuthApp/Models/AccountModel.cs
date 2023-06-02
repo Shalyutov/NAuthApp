@@ -31,7 +31,7 @@ namespace NAuthApp.Models
         [DefaultValue("")]
         public string? Surname { get; set; }
         [DefaultValue(0)]
-        public ulong Phone { get; set; }
+        public ulong? Phone { get; set; }
         [StringLength(128, ErrorMessage = "Значение слишком длинное")]
         [DefaultValue("")]
         public string? LastName { get; set; }

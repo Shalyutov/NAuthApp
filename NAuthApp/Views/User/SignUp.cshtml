@@ -25,7 +25,7 @@
             </div>
             <div class="container p-2">
                 <form asp-action="NSignUp" asp-controller="User">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <span asp-validation-summary="ModelOnly" class="text-danger"></span>
                     <div class="m-1 text-start text-muted"><small>Логин</small></div>
                     <div class="input-group mb-1">
                         <input asp-for="Username" type="text" class="form-control rounded w-100" placeholder="Логин">
