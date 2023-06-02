@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NAuthApp.Models
 {
-    public class CredentialsModel
+    public class AuthPair
     {
         [Remote("IsUserExists", "User", HttpMethod = "Get")]
         [Required(ErrorMessage = "Обязательное поле")]

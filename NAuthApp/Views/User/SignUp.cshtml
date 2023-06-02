@@ -1,0 +1,87 @@
+﻿@model AccountModel
+@using System.Security.Claims;
+@{
+    ViewData["Title"] = "Регистрация";
+    Layout = "_LayoutAccount.cshtml";
+}
+<div class="profile-header glasscard-profile">
+    <div class="m-2">
+        <div class="container-fluid mt-2 mb-3">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <img src="~/img/NAuthShieldColor.png" height="48" style="margin-top: -2%;" />
+                <span class="fs-5 text-black"><strong>Аккаунт</strong></span>
+            </a>
+        </div>
+        <div class="">
+            <div class="card" style="border-radius: 15px;">
+                <div class="card-body m-1">
+                    <div class="">
+                        <img src="~/img/user.png" alt="photo" class="img-fluid" style="height: 56px; border-radius: 10px;">
+                        <div class="lh-1 mt-1">
+                            <small><span class="">Регистрация новой учётной записи</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container p-2">
+                <form asp-action="NSignUp" asp-controller="User">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="m-1 text-start text-muted"><small>Логин</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Username" type="text" class="form-control rounded w-100" placeholder="Логин">
+                    </div>
+                    <span asp-validation-for="Username"></span>
+                    <div class="m-1 text-start text-muted"><small>Пароль</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Password" type="password" class="form-control rounded w-100" placeholder="Пароль">
+                    </div>
+                    <span asp-validation-for="Password"></span>
+                    <div class="input-group mb-1">
+                        <input asp-for="Confirm" type="password" class="form-control rounded w-100" placeholder="Подтверждение пароля">
+                    </div>
+                    <span asp-validation-for="Confirm"></span>
+                    <div class="m-1 text-start text-muted"><small>Фамилия</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Surname" type="text" class="form-control rounded w-100" placeholder="Фамилия">
+                    </div>
+                    <span asp-validation-for="Surname"></span>
+                    <div class="m-1 text-start text-muted"><small>Имя</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Name" type="text" class="form-control rounded w-100" placeholder="Имя">
+                    </div>
+                    <span asp-validation-for="Name"></span>
+                    <div class="m-1 text-start text-muted"><small>Отчество</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="LastName" type="text" class="form-control rounded w-100" placeholder="Отчество">
+                    </div>
+                    <span asp-validation-for="LastName"></span>
+                    <div class="m-1 text-start text-muted"><small>Пол</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Gender" type="radio" value="male" class="form-check-input rounded">
+                        <label class="form-check-label ms-1">Мужчина</label>
+                        <div class="m-2"></div>
+                        <input asp-for="Gender" type="radio" value="female" class="form-check-input rounded">
+                        <label class="form-check-label ms-1">Женщина</label>
+                    </div>
+                    <span asp-validation-for="Surname"></span>
+                    <div class="m-1 text-start text-muted"><small>Телефон</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Phone" type="tel" class="form-control rounded w-100" placeholder="Телефон">
+                    </div>
+                    <span asp-validation-for="Phone"></span>
+                    <div class="m-1 text-start text-muted"><small>Email</small></div>
+                    <div class="input-group mb-1">
+                        <input asp-for="Email" type="email" class="form-control rounded w-100" placeholder="Email">
+                    </div>
+                    <span asp-validation-for="Email"></span>
+                    <button type="submit" class="btn btn-outline-success mt-2 w-100">Зарегистрировать</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

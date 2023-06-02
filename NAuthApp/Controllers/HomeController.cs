@@ -34,6 +34,7 @@ namespace NAuthApp.Controllers
         {
             return View();
         }
+
         [Route("/help")]
         public IActionResult Help()
         {

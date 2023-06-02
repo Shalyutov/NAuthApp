@@ -1,8 +1,29 @@
-﻿@using System.Security.Claims;
+﻿@model Account
+@using System.Security.Claims;
 @{
     ViewData["Title"] = "Аккаунт";
     Layout = "_LayoutAccount.cshtml";
 }
+<div class="modal" id="del-user" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5">Удаление аккаунта</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+                <p>Ваш аккаунт будет мгновенно удалён. Действие необратимо.</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+                <form asp-action="Delete">
+                    <input name="delete" value="true" hidden />
+                    <button type="submit" class="btn btn-lg btn-danger w-100">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="profile-header glasscard-profile">
     <div class="m-2">
         <div class="container-fluid mt-2 mb-3">
@@ -17,7 +38,7 @@
                     <div class="">
                         <img src="~/img/user.png" alt="photo" class="img-fluid" style="height: 56px; border-radius: 10px;">
                         <div class="lh-1 mt-1">
-                            <h4 class="mb-0 lh-1">@Context.User.FindFirst(ClaimTypes.Surname)?.Value @Context.User.FindFirst(ClaimTypes.Name)?.Value @Context.User.FindFirst("LastName")?.Value</h4>
+                            <h4 class="mb-0 lh-1">@Model.Surname @Model.Name @Model.LastName</h4>
                             <small><span class="text-muted">@@@Context.User.FindFirst(ClaimTypes.Upn)?.Value</span></small>
                         </div>
                     </div>
@@ -29,11 +50,11 @@
                         <img src="~/img/change.png" alt="twbs" height="28" class="flex-shrink-0">
                         <span class="ms-2">Сменить пароль</span>
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action container gap-2 py-2 text-start disabled" aria-current="true">
+                    <a asp-action="Edit" class="list-group-item list-group-item-action container gap-2 py-2 text-start" aria-current="true">
                         <img src="~/img/edit.png" alt="twbs" height="28" class="flex-shrink-0">
                         <span class="ms-2">Редактировать аккаунт</span>
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action container gap-2 py-2 text-start disabled" aria-current="true">
+                    <a asp-action="Raw" class="list-group-item list-group-item-action container gap-2 py-2 text-start" aria-current="true">
                         <img src="~/img/user.png" alt="twbs" height="28" class="flex-shrink-0">
                         <span class="ms-2">Получить данные</span>
                     </a>
@@ -41,15 +62,19 @@
                         <img src="~/img/logout.png" alt="twbs" height="24" class="flex-shrink-0">
                         <span class="ms-2">Завершить все сессии</span>
                     </a>
+                    <a data-bs-toggle="modal" data-bs-target="#del-user" href="#" class="list-group-item list-group-item-action container gap-2 py-2 text-start" aria-current="true">
+                        <img src="~/img/remove-user.png" alt="twbs" height="28" class="flex-shrink-0">
+                        <span class="ms-2 text-danger">Удалить аккаунт</span>
+                    </a>
                 </div>
                 <form asp-action="UpdateAccount">
                     <div class="m-1 text-start text-muted"><small>Телефон</small></div>
                     <div class="input-group mb-1">
-                        <input name="Phone" type="tel" class="form-control rounded w-100" placeholder="Телефон" value="+@Context.User.FindFirst(ClaimTypes.MobilePhone)?.Value">
+                        <input name="phone" type="tel" class="form-control rounded w-100" placeholder="Телефон" value="@Model.Phone">
                     </div>
                     <div class="m-1 text-start text-muted"><small>Email</small></div>
                     <div class="input-group mb-1">
-                        <input name="Email" type="email" class="form-control w-100 rounded" placeholder="Email" value="@Context.User.FindFirst(ClaimTypes.Email)?.Value">
+                        <input name="email" type="email" class="form-control w-100 rounded" placeholder="Email" value="@Model.Email">
                     </div>
                     <button type="submit" class="btn btn-outline-success mt-2 w-100">Сохранить</button>
                 </form>

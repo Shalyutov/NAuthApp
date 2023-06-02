@@ -1,0 +1,61 @@
+﻿@model Account
+@using System.Security.Claims;
+@{
+    ViewData["Title"] = "Редактирование аккаунта";
+    Layout = "_LayoutAccount.cshtml";
+}
+<div class="profile-header glasscard-profile">
+    <div class="m-2">
+        <div class="container-fluid mt-2 mb-3">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <img src="~/img/NAuthShieldColor.png" height="48" style="margin-top: -2%;" />
+                <span class="fs-5 text-black"><strong>Аккаунт</strong></span>
+            </a>
+        </div>
+        <div class="">
+            <div class="card" style="border-radius: 15px;">
+                <div class="card-body m-1">
+                    <div class="">
+                        <img src="~/img/user.png" alt="photo" class="img-fluid" style="height: 56px; border-radius: 10px;">
+                        <div class="lh-1 mt-1">
+                            <small><span class="">@@@Context.User.FindFirst(ClaimTypes.Upn)?.Value</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container p-2">
+                <form asp-action="UpdateAccount">
+                    <div class="m-1 text-start text-muted"><small>Фамилия</small></div>
+                    <div class="input-group mb-1">
+                        <input name="surname" type="text" class="form-control rounded w-100" placeholder="Фамилия" value="@Model.Surname">
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Имя</small></div>
+                    <div class="input-group mb-1">
+                        <input name="name" type="text" class="form-control rounded w-100" placeholder="Имя" value="@Model.Name">
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Отчество</small></div>
+                    <div class="input-group mb-1">
+                        <input name="lastname" type="text" class="form-control rounded w-100" placeholder="Отчество" value="@Model.LastName">
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Пол</small></div>
+                    <div class="input-group mb-1">
+                        @Html.RadioButton("gender", "male", Model.Gender == "male")
+                        <span class="ms-1">Мужчина</span>
+                        <div class="m-2"></div>
+                        @Html.RadioButton("gender", "female", Model.Gender == "female")
+                        <span class="ms-1">Женщина</span>
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Телефон</small></div>
+                    <div class="input-group mb-1">
+                        <input name="phone" type="tel" class="form-control rounded w-100" placeholder="Телефон" value="@Model.Phone">
+                    </div>
+                    <div class="m-1 text-start text-muted"><small>Email</small></div>
+                    <div class="input-group mb-1">
+                        <input name="email" type="email" class="form-control w-100 rounded" placeholder="Email" value="@Model.Email">
+                    </div>
+                    <button type="submit" class="btn btn-outline-success mt-2 w-100">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
