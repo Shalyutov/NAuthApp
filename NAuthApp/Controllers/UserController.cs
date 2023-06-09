@@ -344,7 +344,7 @@ namespace NAuthApp.Controllers
                 {
                     var pair = JsonConvert.DeserializeObject<AccessPair>(await result.Content.ReadAsStringAsync());
                     JwtSecurityTokenHandler handler = new();
-                    AuthenticationProperties properties = new AuthenticationProperties();
+                    AuthenticationProperties properties = new();
                     properties.StoreTokens(new List<AuthenticationToken>() {
                         new AuthenticationToken(){ Name = "refresh_token", Value = pair?.refresh_token ?? ""}
                     });
