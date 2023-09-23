@@ -101,8 +101,8 @@ namespace NAuthApp.Controllers
                 return RedirectToAction("SignIn");
             }
             HttpRequestMessage request = new(HttpMethod.Get, "user/account");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
             var result = await client.SendAsync(request);
             if (result == null)
@@ -134,8 +134,8 @@ namespace NAuthApp.Controllers
                 return RedirectToAction("SignIn");
             }
             HttpRequestMessage request = new(HttpMethod.Get, "user/account");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
             var result = await client.SendAsync(request);
             if (result == null)
@@ -170,8 +170,8 @@ namespace NAuthApp.Controllers
                     return RedirectToAction("SignIn");
                 }
                 HttpRequestMessage request = new(HttpMethod.Delete, "user/account");
-                request.Headers.Add("client_id", new List<string>() { app });
-                request.Headers.Add("client_secret", new List<string>() { secret });
+                request.Headers.Add("client", new List<string>() { app });
+                request.Headers.Add("secret", new List<string>() { secret });
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
                 var result = await client.SendAsync(request);
                 if (result == null)
@@ -202,8 +202,8 @@ namespace NAuthApp.Controllers
                 return RedirectToAction("SignIn");
             }
             HttpRequestMessage request = new(HttpMethod.Get, "user/account");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
             var result = await client.SendAsync(request);
             if (result == null)
@@ -233,10 +233,10 @@ namespace NAuthApp.Controllers
             }
             else
             {
-                request = new(HttpMethod.Get, "auth/signout/this");
+                request = new(HttpMethod.Delete, "auth/token");
             }
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var result = await client.SendAsync(request);
             if (result != null)
@@ -263,8 +263,8 @@ namespace NAuthApp.Controllers
         public async Task<IActionResult> IsUserExists(string Username)
         {
             HttpRequestMessage request = new(HttpMethod.Get, $"user/account/exists?username={Username}");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             try
             {
                 var result = await client.SendAsync(request);
@@ -296,8 +296,8 @@ namespace NAuthApp.Controllers
         public async Task<IActionResult> IsUserReady(string Username)
         {
             HttpRequestMessage request = new(HttpMethod.Get, $"user/account/exists?username={Username}");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             try
             {
                 var result = await client.SendAsync(request);
@@ -333,10 +333,15 @@ namespace NAuthApp.Controllers
                 return null;
             if (string.IsNullOrEmpty(access_token))
             {
-                HttpRequestMessage request = new(HttpMethod.Get, "auth/token");
-                request.Headers.Add("client_id", new List<string>() { app });
-                request.Headers.Add("client_secret", new List<string>() { secret });
+                HttpRequestMessage request = new(HttpMethod.Post, "auth/token/refresh");
+                request.Headers.Add("client", new List<string>() { app });
+                request.Headers.Add("secret", new List<string>() { secret });
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refresh_token);
+                var cred = new Dictionary<string, string>
+                {
+                    { "scope", "user" }
+                };
+                request.Content = new FormUrlEncodedContent(cred);
                 var result = await client.SendAsync(request);
                 if (result == null)
                     return null;
@@ -385,8 +390,8 @@ namespace NAuthApp.Controllers
             if (cred.Count == 0)
                 return RedirectToAction("Account");
             HttpRequestMessage request = new(HttpMethod.Put, "user/account");
-            request.Headers.Add("client_id", new List<string>() { app });
-            request.Headers.Add("client_secret", new List<string>() { secret });
+            request.Headers.Add("client", new List<string>() { app });
+            request.Headers.Add("secret", new List<string>() { secret });
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", pair.access_token);
             request.Content = new FormUrlEncodedContent(cred);
             var result = await client.SendAsync(request);
@@ -438,8 +443,8 @@ namespace NAuthApp.Controllers
                     { "username", pair.Username ?? "" },
                     { "password", pair.Password ?? "" }
                 };
-                request.Headers.Add("client_id", new List<string>() { app });
-                request.Headers.Add("client_secret", new List<string>() { secret });
+                request.Headers.Add("client", new List<string>() { app });
+                request.Headers.Add("secret", new List<string>() { secret });
                 request.Content = new FormUrlEncodedContent(cred);
                 var result = await client.SendAsync(request);
                 if (result != null)
@@ -500,11 +505,11 @@ namespace NAuthApp.Controllers
                     { "name", model.Name ?? "" },
                     { "lastname", model.LastName ?? "" },
                     { "email", model.Email ?? "" },
-                    { "phone", model.Phone.ToString() ?? "" },
+                    { "phone", model.Phone.ToString() ?? "0" },
                     { "gender", model.Gender ?? "" }
                 };
-                request.Headers.Add("client_id", new List<string>() { app });
-                request.Headers.Add("client_secret", new List<string>() { secret });
+                request.Headers.Add("client", new List<string>() { app });
+                request.Headers.Add("secret", new List<string>() { secret });
                 request.Content = new FormUrlEncodedContent(cred);
                 var result = await client.SendAsync(request);
                 if (result != null)
